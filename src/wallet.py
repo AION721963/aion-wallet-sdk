@@ -2,16 +2,20 @@
 AION Wallet SDK - Python
 Solana wallet utilities for AI agents on Moltbook
 
+⚠️ IMPORTANT: AION does NOT store your mnemonic or private keys!
+   You are responsible for saving your recovery phrase.
+   Lost mnemonic = Lost funds. No recovery possible.
+
 Usage:
     from aion_wallet import generate_wallet, import_from_mnemonic, validate_address
 
-    # Generate new wallet
+    # Generate new wallet (24-word mnemonic)
     wallet = generate_wallet()
     print(f"Address: {wallet['public_key']}")
-    print(f"Mnemonic: {wallet['mnemonic']}")  # Save this securely!
+    print(f"Mnemonic: {wallet['mnemonic']}")  # ⚠️ SAVE THIS! CANNOT BE RECOVERED!
 
     # Import existing wallet
-    imported = import_from_mnemonic("your twelve word mnemonic phrase here")
+    imported = import_from_mnemonic("your twenty four word mnemonic phrase here")
 
 Requirements:
     pip install solana mnemonic base58
@@ -38,7 +42,10 @@ class ImportedWallet(TypedDict):
 
 def generate_wallet() -> Wallet:
     """
-    Generate a new Solana wallet with a BIP39 mnemonic.
+    Generate a new Solana wallet with a BIP39 mnemonic (24 words).
+
+    ⚠️ CRITICAL: AION does NOT store your mnemonic or private key!
+    You MUST save the mnemonic yourself. It's your ONLY way to recover.
 
     Returns:
         Wallet dict with public_key, secret_key, and mnemonic
@@ -47,11 +54,11 @@ def generate_wallet() -> Wallet:
         wallet = generate_wallet()
         print(f"Address: {wallet['public_key']}")
         print(f"Mnemonic: {wallet['mnemonic']}")
-        # IMPORTANT: Save the mnemonic securely!
+        # ⚠️ SAVE THIS IMMEDIATELY! AION CANNOT RECOVER IT!
     """
-    # Generate 12-word mnemonic
+    # Generate 24-word mnemonic (256-bit entropy for maximum security)
     mnemo = Mnemonic("english")
-    mnemonic = mnemo.generate(strength=128)  # 12 words
+    mnemonic = mnemo.generate(strength=256)  # 24 words
 
     # Derive keypair from mnemonic
     seed = mnemo.to_seed(mnemonic)
@@ -71,7 +78,7 @@ def import_from_mnemonic(mnemonic: str) -> ImportedWallet:
     Import a wallet from an existing BIP39 mnemonic phrase.
 
     Args:
-        mnemonic: 12 or 24 word mnemonic phrase
+        mnemonic: 24 word mnemonic phrase (12 words also supported)
 
     Returns:
         ImportedWallet dict with public_key and secret_key

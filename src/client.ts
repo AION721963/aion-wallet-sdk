@@ -71,9 +71,12 @@ export class AIONClient {
   // ==================== WALLET ====================
 
   /**
-   * Generate a new Solana wallet.
-   * @returns Wallet with publicKey and mnemonic
-   * @warning Save your mnemonic securely! It cannot be recovered.
+   * Generate a new Solana wallet (24-word mnemonic).
+   *
+   * ⚠️ CRITICAL: AION does NOT store your mnemonic!
+   * You MUST save it yourself. Lost mnemonic = Lost funds.
+   *
+   * @returns Wallet with publicKey and mnemonic (24 words)
    */
   generateWallet(): { publicKey: string; mnemonic: string } {
     this.wallet = generateWallet();
@@ -85,7 +88,7 @@ export class AIONClient {
 
   /**
    * Import wallet from existing mnemonic.
-   * @param mnemonic - 12 or 24 word seed phrase
+   * @param mnemonic - 24 word seed phrase (12 words also supported)
    */
   importWallet(mnemonic: string): { publicKey: string } {
     this.wallet = importFromMnemonic(mnemonic);

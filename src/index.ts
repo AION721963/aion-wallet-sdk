@@ -2,17 +2,21 @@
  * AION Wallet SDK
  * Solana wallet utilities for AI agents on Moltbook
  *
+ * ⚠️ IMPORTANT: AION does NOT store your mnemonic or private keys!
+ *    You are responsible for saving your recovery phrase.
+ *    Lost mnemonic = Lost funds. No recovery possible.
+ *
  * @example
  * ```typescript
  * import { generateWallet, importFromMnemonic, validateAddress } from 'aion-wallet-sdk';
  *
- * // Generate new wallet
+ * // Generate new wallet (24-word mnemonic)
  * const wallet = generateWallet();
  * console.log(wallet.publicKey);  // Solana address
- * console.log(wallet.mnemonic);   // Save this securely!
+ * console.log(wallet.mnemonic);   // ⚠️ SAVE THIS! CANNOT BE RECOVERED!
  *
  * // Import existing wallet
- * const imported = importFromMnemonic("your twelve word mnemonic phrase here");
+ * const imported = importFromMnemonic("your twenty four word mnemonic phrase here");
  * ```
  */
 
@@ -32,7 +36,10 @@ export interface ImportedWallet {
 }
 
 /**
- * Generate a new Solana wallet with a BIP39 mnemonic
+ * Generate a new Solana wallet with a BIP39 mnemonic (24 words)
+ *
+ * ⚠️ CRITICAL: AION does NOT store your mnemonic or private key!
+ * You MUST save the mnemonic yourself. It's your ONLY way to recover.
  *
  * @returns Wallet object with publicKey, secretKey, and mnemonic
  *
@@ -41,12 +48,12 @@ export interface ImportedWallet {
  * const wallet = generateWallet();
  * console.log(`Address: ${wallet.publicKey}`);
  * console.log(`Mnemonic: ${wallet.mnemonic}`);
- * // IMPORTANT: Save the mnemonic securely! It cannot be recovered.
+ * // ⚠️ SAVE THIS IMMEDIATELY! AION CANNOT RECOVER IT!
  * ```
  */
 export function generateWallet(): Wallet {
-  // Generate 12-word mnemonic
-  const mnemonic = bip39.generateMnemonic();
+  // Generate 24-word mnemonic (256-bit entropy for maximum security)
+  const mnemonic = bip39.generateMnemonic(256);
 
   // Derive seed from mnemonic
   const seed = bip39.mnemonicToSeedSync(mnemonic);
@@ -68,7 +75,7 @@ export function generateWallet(): Wallet {
 /**
  * Import a wallet from an existing BIP39 mnemonic phrase
  *
- * @param mnemonic - 12 or 24 word mnemonic phrase
+ * @param mnemonic - 24 word mnemonic phrase (12 words also supported)
  * @returns ImportedWallet object with publicKey and secretKey
  * @throws Error if mnemonic is invalid
  *
